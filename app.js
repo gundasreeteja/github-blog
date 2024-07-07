@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
+const _ = require("lodash");
 
 const app = express();
 app.set("view engine", "ejs");
@@ -21,9 +22,6 @@ app.get("/", function (req, res) {
     homeStartingCont: homeStartingContent,
     postsCont: allPosts,
   });
-  for (let i = 0; i < allPosts.length; i++) {
-    console.log(allPosts[i].postTitle);
-  }
 });
 
 app.get("/about", function (req, res) {
@@ -45,6 +43,19 @@ app.post("/compose", function (req, res) {
   };
   allPosts.push(post);
   res.redirect("/");
+});
+
+app.get("/posts/:postName", function (req, res) {
+  const requestedPost = _.lowerCase(req.params.postName);
+  allPosts.forEach((post) => {
+    const storedPost = _.lowerCase(post.postTitle);
+    if (storedPost == requestedPost) {
+      res.render("post", {
+        postTitle: post.postTitle,
+        postBody: post.postBody,
+      });
+    }
+  });
 });
 
 app.listen(3000, function () {
